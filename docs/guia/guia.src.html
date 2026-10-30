@@ -1,0 +1,698 @@
+<title>Bússola de Bolso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+  :root{
+    --ground:#F6F9FA; --surface:#FFFFFF; --surface-2:#EDF3F5;
+    --ink:#0F2329; --ink-2:#3B565E; --ink-3:#6B858C;
+    --rule:#D9E4E7; --rule-2:#C3D4D9;
+    --accent:#0E6E85; --accent-ink:#FFFFFF; --accent-soft:#E2F0F4;
+    --atencao:#A65A00; --atencao-soft:#FBEFDF;
+    --bom:#186B4E; --bom-soft:#E2F1EA;
+    --grave:#9B2530; --grave-soft:#FAE7E8;
+    --sombra:0 1px 2px rgba(15,35,41,.05), 0 8px 24px -18px rgba(15,35,41,.35);
+    --passo:Archivo,"Helvetica Neue",Arial,sans-serif;
+    --texto:"Source Serif 4",Georgia,"Times New Roman",serif;
+    --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0B1417; --surface:#111E22; --surface-2:#16262B;
+      --ink:#E6EFF1; --ink-2:#A9C1C7; --ink-3:#7C969D;
+      --rule:#22383E; --rule-2:#2E484F;
+      --accent:#4FC0DA; --accent-ink:#06191F; --accent-soft:#122F38;
+      --atencao:#E0A25A; --atencao-soft:#2E2213;
+      --bom:#6FCCA4; --bom-soft:#12281F;
+      --grave:#F08A93; --grave-soft:#2C171A;
+      --sombra:0 1px 2px rgba(0,0,0,.5), 0 10px 30px -20px rgba(0,0,0,.9);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0B1417; --surface:#111E22; --surface-2:#16262B;
+    --ink:#E6EFF1; --ink-2:#A9C1C7; --ink-3:#7C969D;
+    --rule:#22383E; --rule-2:#2E484F;
+    --accent:#4FC0DA; --accent-ink:#06191F; --accent-soft:#122F38;
+    --atencao:#E0A25A; --atencao-soft:#2E2213;
+    --bom:#6FCCA4; --bom-soft:#12281F;
+    --grave:#F08A93; --grave-soft:#2C171A;
+    --sombra:0 1px 2px rgba(0,0,0,.5), 0 10px 30px -20px rgba(0,0,0,.9);
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--ground); color:var(--ink); font-family:var(--texto);
+       font-size:17px; line-height:1.65; -webkit-font-smoothing:antialiased}
+  ::selection{background:var(--accent-soft); color:var(--ink)}
+  a{color:var(--accent); text-underline-offset:3px; text-decoration-thickness:1px}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+
+  .folha{max-width:1240px; margin:0 auto; padding:0 24px 96px;
+         display:grid; grid-template-columns:216px minmax(0,1fr); gap:56px; align-items:start}
+  @media (max-width:900px){ .folha{grid-template-columns:1fr; gap:0} }
+
+  /* ---------- capa ---------- */
+  .capa{grid-column:1/-1; padding:72px 0 44px; border-bottom:1px solid var(--rule)}
+  .marca{display:flex; align-items:center; gap:12px; font-family:var(--passo);
+         font-weight:600; letter-spacing:.02em; color:var(--ink-2); font-size:13px;
+         text-transform:uppercase}
+  .marca svg{width:26px; height:26px; flex:none}
+  h1{font-family:var(--passo); font-weight:700; font-size:clamp(38px,6.2vw,64px);
+     line-height:1.02; letter-spacing:-.025em; margin:22px 0 0; text-wrap:balance; max-width:17ch}
+  .subcapa{font-size:20px; color:var(--ink-2); max-width:60ch; margin:18px 0 0}
+  .endereco{display:inline-flex; align-items:baseline; gap:10px; margin-top:26px;
+            padding:12px 18px; border-radius:10px; text-decoration:none;
+            background:var(--accent); color:var(--accent-ink);
+            font-family:var(--passo); box-shadow:var(--sombra)}
+  .endereco span{font-size:12.5px; opacity:.82; letter-spacing:.01em}
+  .endereco strong{font-size:16px; font-weight:600; letter-spacing:-.01em}
+  .endereco:hover{filter:brightness(1.08)}
+  .fatos{display:flex; flex-wrap:wrap; gap:10px; margin-top:22px}
+  .fato{font-family:var(--mono); font-size:12px; letter-spacing:.01em;
+        background:var(--surface); border:1px solid var(--rule); color:var(--ink-2);
+        padding:6px 11px; border-radius:999px}
+
+  /* ---------- navegação ---------- */
+  nav{position:sticky; top:24px; padding-top:44px}
+  @media (max-width:900px){
+    nav{position:static; padding:24px 0 8px; border-bottom:1px solid var(--rule); margin-bottom:8px}
+    nav ol{display:flex; flex-wrap:wrap; gap:8px 18px}
+  }
+  nav p{font-family:var(--passo); text-transform:uppercase; letter-spacing:.1em;
+        font-size:11px; font-weight:600; color:var(--ink-3); margin:0 0 14px}
+  nav ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:3px}
+  @media (max-width:900px){ nav ol{flex-direction:row} }
+  nav a{display:block; font-family:var(--passo); font-size:13.5px; font-weight:500;
+        color:var(--ink-2); text-decoration:none; padding:5px 0; line-height:1.35}
+  nav a:hover{color:var(--accent)}
+  nav .n{font-family:var(--mono); font-size:11px; color:var(--ink-3); margin-right:8px}
+
+  /* ---------- seções ---------- */
+  main{padding-top:44px; min-width:0}
+  section{scroll-margin-top:24px; padding-bottom:12px}
+  section + section{margin-top:64px; padding-top:52px; border-top:1px solid var(--rule)}
+  .olho{font-family:var(--mono); font-size:11.5px; letter-spacing:.08em;
+        text-transform:uppercase; color:var(--accent); display:flex; align-items:center; gap:10px}
+  .olho::after{content:""; height:1px; flex:1; background:var(--rule)}
+  h2{font-family:var(--passo); font-weight:700; font-size:clamp(26px,3.4vw,34px);
+     letter-spacing:-.02em; line-height:1.12; margin:14px 0 0; text-wrap:balance; max-width:20ch}
+  h3{font-family:var(--passo); font-weight:600; font-size:19px; letter-spacing:-.01em;
+     margin:40px 0 0; text-wrap:balance}
+  p{max-width:68ch; margin:16px 0 0}
+  .conduz{font-size:19px; color:var(--ink-2); max-width:64ch}
+  strong{font-weight:600}
+  code{font-family:var(--mono); font-size:.86em; background:var(--surface-2);
+       border:1px solid var(--rule); padding:1.5px 6px; border-radius:5px; color:var(--ink)}
+
+  /* ---------- passos numerados ---------- */
+  .passos{list-style:none; counter-reset:p; margin:26px 0 0; padding:0;
+          display:flex; flex-direction:column; gap:20px; max-width:68ch}
+  .passos li{counter-increment:p; display:grid; grid-template-columns:34px 1fr; gap:16px}
+  .passos li::before{content:counter(p); font-family:var(--mono); font-size:12px;
+        color:var(--accent); background:var(--accent-soft); border-radius:999px;
+        width:28px; height:28px; display:grid; place-items:center; margin-top:2px}
+  .passos li > div > b{font-family:var(--passo); font-weight:600; font-size:16px; display:block}
+  .passos li p{margin-top:5px}
+
+  /* ---------- figuras ---------- */
+  figure{margin:32px 0 0; max-width:none}
+  figure img{display:block; width:100%; height:auto; border:1px solid var(--rule-2);
+             border-radius:8px; box-shadow:var(--sombra); background:var(--surface)}
+  figcaption{font-family:var(--passo); font-size:13px; color:var(--ink-3);
+             margin-top:11px; max-width:72ch; line-height:1.5}
+  figcaption b{color:var(--ink-2); font-weight:600}
+
+  /* ---------- avisos ---------- */
+  .nota{margin:28px 0 0; padding:16px 18px; border-radius:8px; max-width:68ch;
+        border:1px solid var(--rule); background:var(--surface); font-size:16px}
+  .nota p{margin:0; max-width:none}
+  .nota p + p{margin-top:9px}
+  .nota b{font-family:var(--passo); font-weight:600}
+  .nota.cuidado{background:var(--atencao-soft); border-color:color-mix(in oklab,var(--atencao) 34%,transparent)}
+  .nota.cuidado b{color:var(--atencao)}
+  .nota.chave{background:var(--accent-soft); border-color:color-mix(in oklab,var(--accent) 30%,transparent)}
+  .nota.chave b{color:var(--accent)}
+
+  /* ---------- tabelas ---------- */
+  .rolagem{overflow-x:auto; margin:28px 0 0; border:1px solid var(--rule);
+           border-radius:8px; background:var(--surface)}
+  table{border-collapse:collapse; width:100%; font-size:15.5px; min-width:520px}
+  th,td{text-align:left; padding:12px 16px; border-bottom:1px solid var(--rule); vertical-align:top}
+  th{font-family:var(--passo); font-weight:600; font-size:12px; text-transform:uppercase;
+     letter-spacing:.06em; color:var(--ink-3); background:var(--surface-2); white-space:nowrap}
+  tr:last-child td{border-bottom:0}
+  td b{font-family:var(--passo); font-weight:600}
+
+  /* ---------- selos da jornada ---------- */
+  .selos{list-style:none; margin:26px 0 0; padding:0; display:grid; gap:2px;
+         border:1px solid var(--rule); border-radius:8px; overflow:hidden; background:var(--rule)}
+  .selos li{background:var(--surface); padding:16px 18px; display:grid;
+            grid-template-columns:30px 1fr; gap:16px; align-items:start}
+  .selos .marca-selo{width:22px; height:22px; border-radius:6px; background:var(--accent-soft);
+        border:1px solid color-mix(in oklab,var(--accent) 40%,transparent); display:grid;
+        place-items:center; font-family:var(--mono); font-size:11px; color:var(--accent); margin-top:2px}
+  .selos b{font-family:var(--passo); font-weight:600; font-size:16px; display:block}
+  .selos span{color:var(--ink-2); font-size:15.5px}
+
+  /* ---------- glossário ---------- */
+  dl{margin:26px 0 0; display:grid; gap:0; border-top:1px solid var(--rule); max-width:72ch}
+  dt{font-family:var(--passo); font-weight:600; font-size:16px; padding:16px 0 0}
+  dd{margin:5px 0 0; padding:0 0 16px; color:var(--ink-2); border-bottom:1px solid var(--rule)}
+
+  .fim{grid-column:1/-1; margin-top:72px; padding-top:28px; border-top:1px solid var(--rule);
+       font-family:var(--passo); font-size:13px; color:var(--ink-3); display:flex;
+       flex-wrap:wrap; gap:8px 22px; justify-content:space-between}
+  @media (prefers-reduced-motion:reduce){ *{animation:none!important; transition:none!important} }
+</style>
+
+<div class="folha">
+
+  <header class="capa">
+    <div class="marca">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="9.2" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M15.4 8.6 10.7 10.7 8.6 15.4l4.7-2.1z" fill="currentColor"/>
+      </svg>
+      <span>Bússola &middot; guia de uso</span>
+    </div>
+    <h1>Como usar o Bússola</h1>
+    <p class="subcapa">Um guia do começo ao fim, escrito para quem nunca abriu o sistema.
+      Cada passo tem a tela de verdade ao lado, e cada palavra difícil está explicada no
+      glossário do final.</p>
+    <a class="endereco" href="https://bussola.suaempresa.com.br">
+      <span>O sistema fica em</span>
+      <strong>bussola.suaempresa.com.br</strong>
+    </a>
+    <div class="fatos">
+      <span class="fato">13 telas</span>
+      <span class="fato">6 selos de mapeamento</span>
+      <span class="fato">5 fases de DMAIC</span>
+      <span class="fato">4 perspectivas do BSC</span>
+      <span class="fato">13 seções de POP</span>
+    </div>
+  </header>
+
+  <nav aria-label="Seções do guia">
+    <p>Neste guia</p>
+    <ol>
+      <li><a href="#oque"><span class="n">01</span>O que é o Bússola</a></li>
+      <li><a href="#entrar"><span class="n">02</span>Primeiro acesso</a></li>
+      <li><a href="#menu"><span class="n">03</span>Como se orientar</a></li>
+      <li><a href="#cargo"><span class="n">04</span>Por onde começar, pelo seu cargo</a></li>
+      <li><a href="#estrategia"><span class="n">05</span>O caminho da estratégia</a></li>
+      <li><a href="#execucao"><span class="n">06</span>O caminho da execução</a></li>
+      <li><a href="#processos"><span class="n">07</span>O caminho dos processos</a></li>
+      <li><a href="#melhoria"><span class="n">08</span>Melhorar o que já existe</a></li>
+      <li><a href="#gestao"><span class="n">09</span>Kit, OPR e bônus</a></li>
+      <li><a href="#comites"><span class="n">10</span>Comitês</a></li>
+      <li><a href="#admin"><span class="n">11</span>Administração</a></li>
+      <li><a href="#regras"><span class="n">12</span>Seis regras da casa</a></li>
+      <li><a href="#glossario"><span class="n">13</span>Glossário</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <section id="oque">
+      <div class="olho">01 &middot; Comece por aqui</div>
+      <h2>O que é o Bússola</h2>
+      <p class="conduz">É onde a empresa guarda, num lugar só, aquilo que antes vivia
+        espalhado em planilhas: o que a empresa quer alcançar, quem está fazendo o quê, como
+        cada trabalho é feito, e como tudo isso é medido.</p>
+      <p>O nome não é decorativo. Uma bússola não anda por você: ela diz onde é o norte e
+        mostra o quanto você desviou. O sistema faz o mesmo. Ele não executa o trabalho, mas
+        responde, a qualquer momento, três perguntas que normalmente ninguém consegue
+        responder de cabeça: <strong>o que prometemos</strong>, <strong>onde estamos</strong> e
+        <strong>o que está travando</strong>.</p>
+      <p>Tudo no Bússola se liga a alguma outra coisa. Uma atividade pertence a um projeto,
+        que nasce de um objetivo, que mede um resultado. Um processo tem um dono, um desenho,
+        um procedimento escrito e um indicador. Essa amarração é o produto: é o que permite
+        clicar num número do painel e chegar até a pessoa e a tarefa que o produziram.</p>
+      <figure>
+        <img src="{{IMG:02-executivo}}" alt="Painel executivo do Bússola, com a Estrela do Norte no topo e cartões de faróis por perspectiva.">
+        <figcaption><b>Painel executivo.</b> A primeira tela de quem dirige. O número grande do
+          topo é a Estrela do Norte, a meta que a empresa escolheu como a mais importante do ano.
+          Os cartões abaixo resumem como cada frente está indo.</figcaption>
+      </figure>
+    </section>
+
+    <section id="entrar">
+      <div class="olho">02 &middot; Três minutos</div>
+      <h2>Primeiro acesso</h2>
+      <p class="conduz">Você recebe um e-mail e uma senha temporária de quem administra o
+        sistema. A senha temporária serve para uma coisa só: deixar você entrar uma vez.</p>
+      <div class="nota chave">
+        <p><b>O endereço é o que a sua empresa publicou (ex.: bussola.suaempresa.com.br)</b></p>
+        <p>Guarde nos favoritos. Não existe aplicativo para instalar: o Bússola abre no
+          navegador, no computador e no celular, com o mesmo endereço.</p>
+      </div>
+      <ol class="passos">
+        <li><div><b>Entre com o e-mail e a senha que você recebeu</b>
+          <p>É o mesmo e-mail que você usa na empresa. Se a senha não funcionar, peça a quem
+            te convidou: senha temporária não pode ser reaproveitada depois de trocada.</p></div></li>
+        <li><div><b>Escolha uma senha sua</b>
+          <p>O sistema exige a troca logo no primeiro acesso, e isso não é opcional. A regra
+            está no banco de dados, não na tela, então não há como pular.</p></div></li>
+        <li><div><b>Confira a empresa no topo da tela</b>
+          <p>Seu grupo pode ter mais de uma empresa. O seletor no alto diz em qual você está
+            olhando. Se você só tem vínculo com uma, ele mostra só essa.</p></div></li>
+      </ol>
+      <figure>
+        <img src="{{IMG:01-login}}" alt="Tela de entrada do Bússola, com campos de e-mail e senha.">
+        <figcaption><b>Tela de entrada.</b> Não existe cadastro por conta própria: alguém da
+          empresa precisa te convidar. Isso é de propósito, porque o acesso carrega o seu cargo
+          e a sua área junto.</figcaption>
+      </figure>
+      <div class="nota cuidado">
+        <p><b>Esqueceu a senha depois de trocada?</b></p>
+        <p>Fale com quem administra o sistema na sua empresa. Ele consegue gerar um novo acesso
+          temporário para você, e o sistema vai exigir a troca de novo.</p>
+      </div>
+    </section>
+
+    <section id="menu">
+      <div class="olho">03 &middot; O mapa do sistema</div>
+      <h2>Como se orientar</h2>
+      <p class="conduz">O menu da esquerda está dividido em seis grupos, e a ordem deles não é
+        alfabética: é a ordem em que as coisas costumam ser usadas.</p>
+      <div class="rolagem">
+        <table>
+          <thead><tr><th>Grupo</th><th>Para que serve</th><th>Quem usa mais</th></tr></thead>
+          <tbody>
+            <tr><td><b>Meu trabalho</b></td><td>O que é seu: suas atividades, seu OKR, os DMAICs que você lidera</td><td>Todo mundo, todo dia</td></tr>
+            <tr><td><b>Estratégia</b></td><td>O que a empresa quer alcançar no ano e como isso desce até as áreas</td><td>Diretoria e gerência</td></tr>
+            <tr><td><b>Execução</b></td><td>Projetos, sprints e o cronograma do ano</td><td>Quem toca projeto</td></tr>
+            <tr><td><b>Processos</b></td><td>Como o trabalho é feito: inventário, fluxos, POPs, indicadores e melhorias</td><td>Quem executa e quem melhora</td></tr>
+            <tr><td><b>Gestão</b></td><td>Kit mínimo de gestão da área, relatório mensal e bônus</td><td>Gerência e diretoria</td></tr>
+            <tr><td><b>Painéis</b></td><td>Visões consolidadas, para decidir e cobrar</td><td>Diretoria e comitês</td></tr>
+            <tr><td><b>Administração</b></td><td>Empresas, áreas, pessoas, comitês e permissões</td><td>Quem administra</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="nota chave">
+        <p><b>Você só vê o que o seu cargo alcança.</b></p>
+        <p>Se um item não aparece no seu menu, não é falha: é o recorte do seu papel. Se você
+          precisa de uma tela para o seu trabalho, peça a revisão do seu papel a quem administra
+          a empresa, em <code>Administração &rsaquo; Permissões</code>.</p>
+      </div>
+      <h3>Uma coisa que confunde no começo</h3>
+      <p>Quando você filtra por uma área, o sistema traz também <strong>as áreas abaixo
+        dela</strong>. Escolher a Diretoria Administrativo-Financeiro traz os processos das
+        cinco gerências que ficam embaixo. Isso é intencional: um diretor que filtrasse pela
+        própria diretoria e recebesse zero, enquanto as gerências dele têm dezenas, receberia
+        uma resposta tecnicamente correta e inútil.</p>
+    </section>
+
+    <section id="cargo">
+      <div class="olho">04 &middot; Escolha a sua linha</div>
+      <h2>Por onde começar, pelo seu cargo</h2>
+      <p class="conduz">O sistema abre numa tela diferente conforme o seu nível, porque o
+        primeiro clique do dia de cada cargo é diferente.</p>
+      <div class="rolagem">
+        <table>
+          <thead><tr><th>Se você é</th><th>Comece em</th><th>O seu trabalho aqui é</th></tr></thead>
+          <tbody>
+            <tr><td><b>Colaborador</b></td><td>Minhas atividades</td><td>Ver o que é seu para esta semana, mover o que terminou e registrar o que travou</td></tr>
+            <tr><td><b>Especialista</b></td><td>Minhas atividades e Inventário</td><td>Além das suas atividades, mapear os processos que você domina e medir os indicadores deles</td></tr>
+            <tr><td><b>Coordenador</b></td><td>Sprints</td><td>Abrir a sprint do time, distribuir as atividades e destravar o que parou</td></tr>
+            <tr><td><b>Gerente</b></td><td>Painel por área</td><td>Cobrar o Kit da sua área, acompanhar os OKRs e garantir que todo processo tenha dono</td></tr>
+            <tr><td><b>Diretor</b></td><td>Painel executivo</td><td>Olhar a Estrela do Norte, ver quais áreas estão em vermelho e clicar até a causa</td></tr>
+            <tr><td><b>Belt</b></td><td>Meus DMAICs</td><td>Conduzir os projetos de melhoria pelas cinco fases e provar o ganho com número</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figure>
+        <img src="{{IMG:07-atividades}}" alt="Tela Minhas atividades, agrupada por horizonte de tempo.">
+        <figcaption><b>Minhas atividades.</b> A tela mais usada do sistema, e a mais simples.
+          Ela agrupa por horizonte de tempo, para separar o que é de hoje do que é do trimestre.</figcaption>
+      </figure>
+    </section>
+
+    <section id="estrategia">
+      <div class="olho">05 &middot; De cima para baixo</div>
+      <h2>O caminho da estratégia</h2>
+      <p class="conduz">Aqui é onde a empresa declara o que quer alcançar. Cada nível nasce do
+        anterior, e é isso que impede a estratégia de virar uma lista de boas intenções soltas.</p>
+      <ol class="passos">
+        <li><div><b>Perspectiva</b>
+          <p>As quatro caixas do BSC: Financeira, Clientes, Processos internos, e Aprendizado e
+            crescimento. Elas existem para a empresa não olhar só para dinheiro.</p></div></li>
+        <li><div><b>Objetivo estratégico</b>
+          <p>A frase do que se quer alcançar, dentro de uma perspectiva. Um deles é marcado como
+            <strong>Estrela do Norte</strong>: o que a empresa escolheu como mais importante do ano.</p></div></li>
+        <li><div><b>OKR</b>
+          <p>O objetivo virado em compromisso de alguém, num período. Tem dono e tem área.</p></div></li>
+        <li><div><b>Key result</b>
+          <p>O número que prova o OKR. Sempre tem ponto de partida, meta e direção (subir ou descer).</p></div></li>
+        <li><div><b>Check-in</b>
+          <p>A atualização periódica do número. Sem check-in, o OKR não tem farol: fica cinza,
+            que quer dizer "ninguém mediu", e não "está indo bem".</p></div></li>
+      </ol>
+      <figure>
+        <img src="{{IMG:03-mapa}}" alt="Mapa estratégico com as quatro perspectivas do BSC e os objetivos dentro de cada uma.">
+        <figcaption><b>Mapa estratégico.</b> As quatro perspectivas com os objetivos dentro.
+          Clicar num objetivo abre os OKRs que nasceram dele, e é ali que se cria um OKR novo.</figcaption>
+      </figure>
+      <figure>
+        <img src="{{IMG:04-okr}}" alt="Árvore de OKR mostrando o desdobramento do corporativo até a área.">
+        <figcaption><b>Árvore de OKR.</b> O desdobramento, do corporativo até o individual.
+          Abrir um OKR mostra os key results, o farol de cada um e o histórico de check-ins.</figcaption>
+      </figure>
+      <div class="nota">
+        <p><b>Quem pode dar check-in.</b></p>
+        <p>Só quem responde pelo resultado: o dono do OKR, quem criou o key result, ou quem tem
+          alçada sobre a área dele. Check-in é a declaração de quanto o resultado andou, e quem
+          declara precisa poder responder por ele.</p>
+      </div>
+    </section>
+
+    <section id="execucao">
+      <div class="olho">06 &middot; O dia a dia</div>
+      <h2>O caminho da execução</h2>
+      <p class="conduz">Projeto é o trabalho com começo e fim. Sprint é a janela de tempo em que
+        o time se compromete. Atividade é a tarefa de uma pessoa.</p>
+      <figure>
+        <img src="{{IMG:05-portfolio}}" alt="Portfólio de projetos, com colunas de status, responsável, progresso e prazo.">
+        <figcaption><b>Portfólio de projetos.</b> Todo projeto deveria estar ligado a um OKR:
+          é o que responde "por que estamos fazendo isto?". O sistema permite salvar sem o
+          vínculo, mas o projeto passa a não aparecer em nenhuma conta de estratégia.</figcaption>
+      </figure>
+      <h3>Como criar e tocar um projeto</h3>
+      <ol class="passos">
+        <li><div><b>Crie o projeto e ligue ao OKR</b>
+          <p>Em <code>Execução &rsaquo; Portfólio de projetos</code>, botão <code>Novo projeto</code>.
+            Escolha a área, o responsável, o prazo e o OKR que ele serve.</p></div></li>
+        <li><div><b>Abra a sprint do time</b>
+          <p>Em <code>Execução &rsaquo; Sprints</code>. A sprint é da área e tem data de início e
+            de fim. Só atividade com sprint aparece no quadro.</p></div></li>
+        <li><div><b>Crie as atividades e dê responsável a cada uma</b>
+          <p>Cada atividade pode apontar para o projeto, para a sprint e para um key result. Quanto
+            mais desses vínculos, mais o trabalho aparece nas contas certas.</p></div></li>
+        <li><div><b>Mova os cartões conforme o trabalho anda</b>
+          <p>O quadro tem cinco colunas: a fazer, fazendo, revisão, concluído e bloqueado.
+            Bloqueado existe para o problema ficar visível, e não para a tarefa sumir.</p></div></li>
+      </ol>
+      <figure>
+        <img src="{{IMG:21-kanban}}" alt="Quadro kanban da sprint, com as cinco colunas e um cartão em A fazer.">
+        <figcaption><b>Quadro da sprint.</b> Cinco colunas. "Bloqueado" existe para o problema
+          ficar visível, e não para a tarefa sumir: cartão parado numa coluna de bloqueio é o
+          que a reunião diária procura.</figcaption>
+      </figure>
+    </section>
+
+    <section id="processos">
+      <div class="olho">07 &middot; A parte mais densa</div>
+      <h2>O caminho dos processos</h2>
+      <p class="conduz">Processo é o trabalho que se repete. Mapear processo é descrever como
+        ele acontece hoje, para poder cobrar, treinar alguém e, depois, melhorar.</p>
+      <p>Esta é a parte do sistema com mais passos, então ela tem uma tela própria que serve de
+        guia: a <strong>Jornada de mapeamento</strong>. Ela dá seis selos a cada processo e
+        mostra quais faltam. Os selos não são marcados à mão: o sistema os acende sozinho quando
+        o dado existe de verdade.</p>
+
+      <ul class="selos">
+        <li><span class="marca-selo">1</span><div><b>Dono</b>
+          <span>Alguém responde pelo resultado. Sem isto, nada mais tem a quem cobrar.</span></div></li>
+        <li><span class="marca-selo">2</span><div><b>SIPOC</b>
+          <span>As quatro pontas: quem fornece, o que entra, o que sai e quem recebe. As quatro, não duas.</span></div></li>
+        <li><span class="marca-selo">3</span><div><b>Fluxo</b>
+          <span>O desenho das etapas, com início e fim. É o que mostra onde o trabalho trava.</span></div></li>
+        <li><span class="marca-selo">4</span><div><b>POP</b>
+          <span>O procedimento escrito e aprovado. Enquanto está em rascunho, não vale como regra.</span></div></li>
+        <li><span class="marca-selo">5</span><div><b>Indicador</b>
+          <span>Um número com meta. Sem ele não dá para provar que uma mudança melhorou algo.</span></div></li>
+        <li><span class="marca-selo">6</span><div><b>Melhoria</b>
+          <span>Um projeto de melhoria aberto sobre o processo. É o último selo porque depende de todos os outros.</span></div></li>
+      </ul>
+
+      <figure>
+        <img src="{{IMG:09-jornada}}" alt="Jornada de mapeamento, com missões da semana, placar por área e a lista de processos com seus selos.">
+        <figcaption><b>Jornada de mapeamento.</b> As missões da semana no topo, o placar das
+          áreas no meio, e a lista de processos com os selos de cada um. <b>Cada selo apagado é
+          um botão</b>: clicar nele abre exatamente a tela que resolve aquela lacuna.</figcaption>
+      </figure>
+
+      <h3>Do zero ao processo mapeado</h3>
+      <ol class="passos">
+        <li><div><b>Cadastre os processos, ou traga a planilha que a área já tem</b>
+          <p>Em <code>Processos &rsaquo; Inventário</code> dá para criar um a um. Se a área já tem
+            uma planilha de atividades, use <code>Importar planilha</code>: o sistema lê, mostra o
+            que entendeu de cada linha e só importa depois da sua confirmação.</p></div></li>
+        <li><div><b>Use a trilha guiada no primeiro processo</b>
+          <p>Um formulário grande e vazio faz a pessoa fechar a aba. A trilha faz uma pergunta de
+            cada vez, explica por que está perguntando, grava a cada passo, e permite pular.
+            "Ainda não sei" é resposta válida e não vira um chute salvo no banco.</p></div></li>
+        <li><div><b>Desenhe o fluxo</b>
+          <p>Etapa por etapa, com tipo (início, atividade, decisão, documento, espera, fim),
+            responsável, sistema onde acontece e tempo estimado. O desenho é gerado sozinho a
+            partir da ordem: ninguém arrasta caixa, e por isso o fluxo nunca fica bonito e
+            desatualizado.</p></div></li>
+        <li><div><b>Aplique o modelo de POP e adapte</b>
+          <p>O POP tem 13 seções, e oito delas o sistema já preenche sozinho com o que você
+            mapeou. O modelo da empresa preenche as outras com o texto padrão, e ele nunca
+            sobrescreve o que você escreveu.</p></div></li>
+        <li><div><b>Cadastre o indicador com meta e comece a medir</b>
+          <p>Sem um indicador do tipo Y, com meta, o processo não fica pronto para uma melhoria:
+            não haveria como provar que ela funcionou.</p></div></li>
+      </ol>
+
+      <figure>
+        <img src="{{IMG:19-trilha}}" alt="Trilha guiada de mapeamento, mostrando uma pergunta por vez com o motivo dela.">
+        <figcaption><b>Trilha guiada.</b> Uma pergunta de cada vez, com o porquê logo abaixo.
+          Ela grava a cada passo, então quem fecha no meio não perde o que já respondeu, e
+          pular um passo não inventa valor nenhum.</figcaption>
+      </figure>
+
+      <figure>
+        <img src="{{IMG:08-inventario}}" alt="Inventário de processos com filtros de área e categoria.">
+        <figcaption><b>Inventário de processos.</b> A lista mestre. Cada linha mostra a categoria,
+          a cadência e o prazo. Onde a cadência não pôde ser classificada, a tela diz isso por
+          extenso, em vez de deixar em branco e parecer que ninguém preencheu.</figcaption>
+      </figure>
+
+      <figure>
+        <img src="{{IMG:10-importar}}" alt="Tela de importação de planilha de processos.">
+        <figcaption><b>Importar planilha.</b> A revisão antes de importar é a parte que importa:
+          ela aponta o que já existe, o que está sem cadência e o que veio com uma pergunta
+          colada no nome da atividade.</figcaption>
+      </figure>
+
+      <figure>
+        <img src="{{IMG:17-fluxo}}" alt="Painel do fluxo do processo, com o fluxograma desenhado automaticamente e a lista de etapas.">
+        <figcaption><b>Fluxo do processo.</b> O desenho sai da ordem das etapas. Etapa sem
+          responsável aparece tracejada, e gargalo aparece destacado, porque são as duas coisas
+          que uma melhoria vai atacar primeiro.</figcaption>
+      </figure>
+
+      <figure>
+        <img src="{{IMG:18-pop}}" alt="Painel do POP, mostrando seções pendentes, seções preenchidas e o aviso de rascunho.">
+        <figcaption><b>POP do processo.</b> O documento se remonta a partir do que já está
+          mapeado, e diz quais seções ainda faltam, por nome. Enquanto o status é rascunho, a
+          tela avisa que aquilo ainda não vale como procedimento.</figcaption>
+      </figure>
+
+      <div class="nota cuidado">
+        <p><b>Quem escreve o POP não é quem aprova.</b></p>
+        <p>Aprovar POP é uma permissão separada de editar. A seção 8 do próprio modelo de POP
+          pede segregação de funções, e um procedimento em que o autor também assina a
+          aprovação não tem controle nenhum. Coordenador e especialista escrevem; gerente,
+          diretor e administrador aprovam.</p>
+      </div>
+    </section>
+
+    <section id="melhoria">
+      <div class="olho">08 &middot; Six Sigma, sem mistério</div>
+      <h2>Melhorar o que já existe</h2>
+      <p class="conduz">Quando um processo mapeado tem um problema medido, abre-se um projeto de
+        melhoria. O método padrão aqui é o DMAIC, cinco fases que existem para impedir o erro
+        mais comum: sair mudando antes de entender.</p>
+      <ol class="passos">
+        <li><div><b>Define</b><p>Qual é o problema, em número, e qual é a meta. Precisa do SIPOC pronto, senão não há escopo.</p></div></li>
+        <li><div><b>Measure</b><p>Medir como está hoje. É a linha de base contra a qual o ganho será comparado depois.</p></div></li>
+        <li><div><b>Analyze</b><p>Descobrir a causa, e não o sintoma. É a fase que costuma ser pulada, e é por isso que melhoria não gruda.</p></div></li>
+        <li><div><b>Improve</b><p>Mudar o processo. Aqui entram as atividades, o responsável e o prazo de cada entrega.</p></div></li>
+        <li><div><b>Control</b><p>Garantir que não volta ao que era. O ganho realizado só é preenchido aqui, e é por isso que ele aparece como "sem dado" antes.</p></div></li>
+      </ol>
+      <figure>
+        <img src="{{IMG:11-dmaics}}" alt="Tela Meus DMAICs, com os projetos de melhoria liderados pela pessoa.">
+        <figcaption><b>Meus DMAICs.</b> A tela do belt. Se o DMAIC ainda não tem corpo de projeto,
+          existe um botão para criá-lo: é ele que permite o DMAIC receber atividades, entrar numa
+          sprint e aparecer no cronograma.</figcaption>
+      </figure>
+      <div class="nota">
+        <p><b>Belt não é cargo, é papel.</b></p>
+        <p>Belt é quem conduz o projeto de melhoria. A pessoa pode ser coordenadora de uma área e
+          belt de um DMAIC em outra. Por isso "Meus DMAICs" fica no grupo Meu trabalho, junto com
+          as outras lentes pessoais.</p>
+      </div>
+    </section>
+
+    <section id="gestao">
+      <div class="olho">09 &middot; O que a diretoria cobra</div>
+      <h2>Kit, OPR e bônus</h2>
+      <p class="conduz">Três telas que respondem a mesma pergunta em escalas diferentes: a área
+        está se gerindo?</p>
+      <h3>Kit de gestão</h3>
+      <p>O mínimo que toda área precisa ter: mapa estratégico com OKR no ano corrente, processos
+        com SIPOC completo, e o relatório do mês publicado. O status de cada item não é digitado:
+        ele é lido do que existe de fato nos outros módulos. Ninguém marca "em dia" aqui.</p>
+      <figure>
+        <img src="{{IMG:12-kit}}" alt="Matriz do Kit de gestão, com uma linha por área e três colunas de item.">
+        <figcaption><b>Kit de gestão.</b> Uma linha por área, três itens por linha. É a tela que
+          o diretor usa para cobrar o vermelho, e por isso ela precisa ser rigorosa: um SIPOC
+          preenchido pela metade não conta como feito.</figcaption>
+      </figure>
+      <h3>OPR</h3>
+      <p>O One Page Report: o relatório mensal da área, montado com os dados que já estão no
+        sistema. Publicar o OPR do mês é o que acende o terceiro item do Kit.</p>
+      <h3>Bônus</h3>
+      <p>A apuração do modelo de remuneração variável. Ela combina três escopos: o resultado
+        global da empresa, o setorial (que vem do Kit da área) e o individual. Os pesos e as
+        faixas de pagamento ficam configurados por ano.</p>
+      <div class="nota cuidado">
+        <p><b>Congelar o mês do Kit não é uma ação qualquer.</b></p>
+        <p>Ela grava o histórico que pesa no bônus setorial, e por isso depende de permissão
+          própria. Se o botão não aparece para você, é porque o seu papel não inclui essa chave.</p>
+      </div>
+    </section>
+
+    <section id="comites">
+      <div class="olho">10 &middot; O que atravessa as áreas</div>
+      <h2>Comitês</h2>
+      <p class="conduz">Comitê é um fórum que acompanha assuntos de várias áreas ao mesmo tempo.
+        Ele não é dono de nada, e essa distinção é a coisa mais importante desta seção.</p>
+      <p>Um projeto da Tesouraria pode ser acompanhado pelo Comitê de Orçamento <strong>sem
+        deixar de ser da Tesouraria</strong>. Ele continua contando para o Kit, para o OPR e para
+        o bônus da Tesouraria. O comitê só ganha uma lente por cima.</p>
+      <p>O vínculo é criado na tela do próprio item, não na tela do comitê. Você abre o projeto,
+        o OKR ou o processo e diz quais comitês o acompanham.</p>
+      <figure>
+        <img src="{{IMG:13-comites}}" alt="Tela de cadastro de comitês, com cadência, coordenador e contagem de itens acompanhados.">
+        <figcaption><b>Comitês.</b> Cadência, coordenador e a lista de presença. O número de
+          áreas atravessadas é o que justifica a existência do fórum: um comitê que atravessa
+          uma área só é uma reunião de equipe.</figcaption>
+      </figure>
+    </section>
+
+    <section id="admin">
+      <div class="olho">11 &middot; Para quem administra</div>
+      <h2>Administração</h2>
+      <p class="conduz">Quatro telas que quase ninguém abre, e que definem o que todo mundo
+        consegue fazer.</p>
+      <div class="rolagem">
+        <table>
+          <thead><tr><th>Tela</th><th>O que você faz nela</th></tr></thead>
+          <tbody>
+            <tr><td><b>Empresas</b></td><td>Consulta as empresas em que você tem vínculo. É só leitura: criar empresa é operação de plataforma</td></tr>
+            <tr><td><b>Áreas</b></td><td>O organograma: diretorias, gerências e especialistas, com o responsável de cada uma</td></tr>
+            <tr><td><b>Pessoas</b></td><td>Cadastrar gente, definir cargo, nível, área de lotação e papel</td></tr>
+            <tr><td><b>Comitês</b></td><td>Criar os fóruns transversais e a lista de presença de cada um</td></tr>
+            <tr><td><b>Permissões</b></td><td>Ver o que cada papel pode fazer. É só leitura: os papéis vêm do sistema</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figure>
+        <img src="{{IMG:14-pessoas}}" alt="Tela de pessoas, com vínculos, cargo, nível, lotação e papel.">
+        <figcaption><b>Pessoas.</b> Aqui você vê quem tem acesso, por qual área responde e em
+          qual é lotado. O botão de cadastrar fica no alto, à direita.</figcaption>
+      </figure>
+
+      <h3>Como dar acesso a alguém</h3>
+      <p>Não existe cadastro por conta própria: alguém com permissão precisa criar o acesso.
+        É de propósito, porque o acesso já nasce com o cargo, a área e o papel da pessoa.</p>
+      <ol class="passos">
+        <li><div><b>Preencha os dados em Pessoas, botão "Cadastrar pessoa"</b>
+          <p>E-mail, nome, cargo, nível, papel e área de lotação. Só o e-mail e o nome são
+            obrigatórios; o resto dá para ajustar depois.</p></div></li>
+        <li><div><b>Copie as credenciais que aparecem</b>
+          <p>O sistema gera a senha temporária e mostra endereço, login e senha, cada um com
+            botão de copiar. O botão principal copia a mensagem inteira, já escrita, pronta
+            para colar no WhatsApp ou no e-mail.</p></div></li>
+        <li><div><b>Repasse antes de fechar a janela</b>
+          <p>A senha aparece uma única vez. O sistema guarda só o resumo criptográfico dela,
+            então nem ele consegue mostrá-la de novo. Se perder, é só cadastrar de novo, o que
+            gera outra senha.</p></div></li>
+      </ol>
+
+      <figure>
+        <img src="{{IMG:20-credenciais}}" alt="Painel de credenciais depois do cadastro, com endereço, login e senha temporária, cada um com botão de copiar.">
+        <figcaption><b>As credenciais, prontas para repassar.</b> A senha aparece sem
+          asteriscos porque quem cadastrou precisa lê-la para repassar. Esconder ali seria
+          teatro: quem tem a tela aberta é justamente quem deve ver.</figcaption>
+      </figure>
+      <div class="nota">
+        <p><b>Duas travas que existem para o seu bem.</b></p>
+        <p>Você não consegue remover o próprio acesso de administrador, nem desativar o próprio
+          vínculo. E o sistema não deixa a empresa ficar sem nenhum administrador ativo. Sem essas
+          travas, um clique distraído deixaria a empresa sem quem a administre.</p>
+      </div>
+    </section>
+
+    <section id="regras">
+      <div class="olho">12 &middot; Leia antes de reclamar</div>
+      <h2>Seis regras da casa</h2>
+      <p class="conduz">Coisas que parecem defeito na primeira semana e são decisões deliberadas.</p>
+      <ol class="passos">
+        <li><div><b>Vazio nunca é zero</b>
+          <p>Quando o sistema mostra "sem dado" em vez de 0, é porque ninguém mediu ainda. Zero
+            só aparece quando foi contado de verdade. Um 0% tranquilizador numa área que nem
+            começou é a pior mentira que um painel pode contar.</p></div></li>
+        <li><div><b>Filtrar por uma área inclui as áreas abaixo</b>
+          <p>Sempre, sem opção. Escolher a diretoria traz as gerências dela.</p></div></li>
+        <li><div><b>Comitê não é área</b>
+          <p>Ele não tem Kit, não publica OPR e não entra no bônus. Ele acompanha itens que
+            pertencem às áreas.</p></div></li>
+        <li><div><b>SIPOC pela metade não conta</b>
+          <p>O sistema só considera o SIPOC feito quando as quatro pontas estão preenchidas. Duas
+            pontas não delimitam um processo.</p></div></li>
+        <li><div><b>POP em rascunho não é regra</b>
+          <p>Enquanto ninguém aprovou, o que está escrito ali é intenção. Quem executa não pode
+            se apoiar num texto que não passou por uma segunda leitura.</p></div></li>
+        <li><div><b>Se salvar não funcionou, o sistema diz</b>
+          <p>Quando uma gravação não altera nada, a mensagem cita as duas causas possíveis:
+            alguém alterou o registro antes de você, ou você não tem permissão para aquilo. Ela
+            nunca finge que deu certo.</p></div></li>
+      </ol>
+      <figure>
+        <img src="{{IMG:15-area}}" alt="Painel por área, agrupado por diretoria, com OKRs, projetos, processos e Kit de cada área.">
+        <figcaption><b>Painel por área.</b> Agrupado por diretoria, com o resumo de cada gerência.
+          Os números daqui levam ao detalhe: clicar leva à tela onde aquele número foi produzido,
+          já filtrada pela área.</figcaption>
+      </figure>
+    </section>
+
+    <section id="glossario">
+      <div class="olho">13 &middot; Consulta rápida</div>
+      <h2>Glossário</h2>
+      <p class="conduz">As palavras que aparecem no sistema e que ninguém explica numa reunião.</p>
+      <dl>
+        <dt>BSC</dt><dd>Balanced Scorecard. O jeito de organizar a estratégia em quatro perspectivas, para a empresa não olhar só para o resultado financeiro.</dd>
+        <dt>Estrela do Norte</dt><dd>O objetivo que a empresa elegeu como o mais importante do ano. Só existe um.</dd>
+        <dt>OKR</dt><dd>Objective and Key Results. Um objetivo com dono, mais os números que provam se ele foi alcançado.</dd>
+        <dt>Key result (KR)</dt><dd>O número de um OKR. Tem ponto de partida, meta e direção. Sem check-in, fica sem farol.</dd>
+        <dt>Check-in</dt><dd>A atualização periódica de um key result, feita por quem responde pelo resultado.</dd>
+        <dt>Farol</dt><dd>A cor que resume se um resultado está no ritmo. Cinza quer dizer "ninguém mediu", e não "está tudo bem".</dd>
+        <dt>Sprint</dt><dd>A janela de tempo em que um time se compromete com um conjunto de atividades.</dd>
+        <dt>Processo</dt><dd>Trabalho que se repete, com entrada, saída e um jeito de ser feito.</dd>
+        <dt>SIPOC</dt><dd>Fornecedores, entradas, processo, saídas e clientes. O contorno de um processo: onde ele começa e onde termina.</dd>
+        <dt>POP</dt><dd>Procedimento Operacional Padrão. O documento que descreve como o trabalho é feito, em 13 seções.</dd>
+        <dt>Gargalo</dt><dd>A etapa que dita o ritmo de todo o processo. Acelerar qualquer outra não muda o tempo total.</dd>
+        <dt>Indicador Y</dt><dd>O número que mede o resultado do processo. O X mede uma causa que influencia o Y.</dd>
+        <dt>DMAIC</dt><dd>Define, Measure, Analyze, Improve, Control. As cinco fases de um projeto de melhoria.</dd>
+        <dt>Tollgate</dt><dd>A aprovação formal para passar de uma fase do DMAIC para a próxima.</dd>
+        <dt>Belt</dt><dd>Quem conduz um projeto de melhoria. É papel, não cargo.</dd>
+        <dt>Kit de gestão</dt><dd>O mínimo que toda área precisa ter: OKR no ano, processos com SIPOC e OPR publicado.</dd>
+        <dt>OPR</dt><dd>One Page Report. O relatório mensal da área, em uma página.</dd>
+        <dt>Comitê</dt><dd>Fórum que acompanha assuntos de várias áreas ao mesmo tempo, sem ser dono deles.</dd>
+        <dt>Alçada</dt><dd>As áreas pelas quais você responde: a sua, as que você lidera e todas as que ficam abaixo delas.</dd>
+        <dt>Lotação</dt><dd>A área onde você trabalha. É o que faz "a sprint da minha área" existir para quem não lidera nenhuma.</dd>
+      </dl>
+    </section>
+
+  </main>
+
+  <footer class="fim">
+    <span>Bússola &middot; guia de uso</span>
+    <span>Bússola, gestão estratégica open source</span>
+  </footer>
+</div>

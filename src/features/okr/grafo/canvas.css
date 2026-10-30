@@ -1,0 +1,46 @@
+/*
+ * Tokens do React Flow apontando para os tokens do index.css. Nada de cor
+ * fixa: o tema escuro troca os `--x` e o canvas acompanha sozinho.
+ */
+.canvas-de-okr .react-flow {
+  --xy-background-color: hsl(var(--background));
+  --xy-background-pattern-color: hsl(var(--border));
+  --xy-edge-stroke: hsl(var(--muted-foreground) / 0.55);
+  --xy-edge-stroke-selected: hsl(var(--primary));
+  --xy-edge-stroke-width: 1.5;
+  --xy-connectionline-stroke: hsl(var(--primary));
+  --xy-connectionline-stroke-width: 2;
+  --xy-minimap-background-color: hsl(var(--card));
+  --xy-minimap-mask-background-color: hsl(var(--muted) / 0.6);
+  --xy-minimap-mask-stroke-color: hsl(var(--border));
+  --xy-minimap-node-background-color: hsl(var(--muted-foreground) / 0.35);
+  --xy-controls-button-background-color: hsl(var(--card));
+  --xy-controls-button-background-color-hover: hsl(var(--accent));
+  --xy-controls-button-color: hsl(var(--foreground));
+  --xy-controls-button-color-hover: hsl(var(--foreground));
+  --xy-controls-button-border-color: hsl(var(--border));
+  --xy-controls-box-shadow: none;
+  --xy-handle-background-color: hsl(var(--primary));
+  --xy-handle-border-color: hsl(var(--card));
+  --xy-selection-background-color: hsl(var(--primary) / 0.08);
+  --xy-selection-border: 1px dashed hsl(var(--primary));
+  --xy-node-boxshadow-selected: 0 0 0 2px hsl(var(--ring));
+  --xy-node-border-radius: 0.75rem;
+}
+
+/* A alça fica maior que o padrão para dar alvo ao arrasto. */
+.canvas-de-okr .react-flow__handle {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+}
+
+/* Alvo válido durante o arrasto: a alça de entrada pulsa. */
+.canvas-de-okr .react-flow__handle.alvo-valido {
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.25);
+}
+
+.canvas-de-okr .react-flow__minimap {
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+}

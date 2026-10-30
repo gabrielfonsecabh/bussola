@@ -1,0 +1,28 @@
+# Cloudflare Workers com assets estáticos.
+#
+# O projeto foi criado no fluxo de Workers, e não no de Pages: o deploy roda
+# `npx wrangler deploy`. A configuração inteira mora aqui, e não no painel, para
+# o deploy não depender do que alguém digitou numa caixa de texto que ninguém
+# revisa nem versiona.
+# Precisa casar com o nome do Worker na Cloudflare, que veio do repositório.
+# Um nome diferente faz o wrangler tentar criar um Worker novo, e o log avisa:
+# "Failed to match Worker name ... the CI system expected bussola".
+name = "bussola"
+compatibility_date = "2026-09-11"
+
+# O build roda ANTES do deploy, como parte do próprio wrangler. Sem isto o
+# Workers Builds vai direto de `npm install` para `wrangler deploy` e não existe
+# dist nenhum para publicar.
+[build]
+command = "npm run build"
+
+[assets]
+directory = "./dist"
+
+# Rota profunda de SPA, resolvida pela própria plataforma: qualquer caminho que
+# não casa com um arquivo devolve o index.html com 200. É o que impede
+# /processos/jornada de dar 404 quando alguém abre o link direto ou aperta F5.
+not_found_handling = "single-page-application"
+
+[observability]
+enabled = true

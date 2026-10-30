@@ -1,0 +1,68 @@
+# ---------------------------------------------------------------------------
+# Segredos. NUNCA commitar. Só .env.example entra no git.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# ---------------------------------------------------------------------------
+# Dependências e build
+# ---------------------------------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+build/
+*.local
+
+# ---------------------------------------------------------------------------
+# Supabase CLI
+# ---------------------------------------------------------------------------
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+.supabase/
+
+# ---------------------------------------------------------------------------
+# Editor e SO
+# ---------------------------------------------------------------------------
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ---------------------------------------------------------------------------
+# Logs e cache
+# ---------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+.vite/
+coverage/
+
+# ---------------------------------------------------------------------------
+# Deploy
+# ---------------------------------------------------------------------------
+.vercel
+
+# ---------------------------------------------------------------------------
+# Material de trabalho do cliente (POPs, planilhas, documentos internos).
+# Nada dentro de Arquivos/ entra no git: são documentos da empresa, com
+# nome de pessoa e dado de operação, e o repositório é compartilhado.
+# ---------------------------------------------------------------------------
+Arquivos/
+
+# ---------------------------------------------------------------------------
+# Cloudflare / wrangler: estado local do `wrangler dev` (miniflare), que
+# recria bancos de teste e caches a cada execução.
+# ---------------------------------------------------------------------------
+.wrangler/

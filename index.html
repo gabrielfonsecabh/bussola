@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/bussola.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="Bússola - gestão estratégica, projetos, processos e desdobramento de OKR para qualquer empresa." />
+    <title>Bússola</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      // Aplica o tema antes da primeira pintura, para não piscar branco no dark.
+      // A chave é a mesma usada por src/components/theme/theme-provider.tsx.
+      ;(function () {
+        try {
+          var salvo = localStorage.getItem('bussola-tema')
+          var escuro =
+            salvo === 'dark' ||
+            ((!salvo || salvo === 'system') &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches)
+          document.documentElement.classList.toggle('dark', escuro)
+        } catch (e) {
+          /* localStorage bloqueado: segue no tema claro */
+        }
+      })()
+    </script>
+  </head>
+  <body class="h-full">
+    <div id="root" class="h-full"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
